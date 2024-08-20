@@ -1,7 +1,7 @@
 SEANCES_CSV = ./data/seances_concatenees_2.csv
 GROUPES_CSV = ./data/acteur-groupe.csv
 ###### 16eme legislature
-SEANCES_URL = http://data.assemblee-nationale.fr/static/openData/repository/16/VP/syceronbrut/syseron.xml.zip
+SEANCES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/vp/syceronbrut/syseron.xml.zip
 GROUPES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/amo/acteurs_mandats_organes_divises/AMO50_acteurs_mandats_organes_divises.json.zip
 VOTES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/loi/scrutins/Scrutins.xml.zip
 
