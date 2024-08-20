@@ -40,7 +40,6 @@ for xml_file in os.listdir(xml_dir):
         all_votes_data.append({
             'titre': titre,
             'groupe': group_ref,
-            'acteur': acteur_ref,
             'pours': pours,
             'contres': contres
         })
