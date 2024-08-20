@@ -1,5 +1,6 @@
-SEANCES_CSV = ./data/seances_concatenees_2.csv
 GROUPES_CSV = ./data/acteur-groupe.csv
+SEANCES_CSV = ./data/seances_concatenees_2.csv
+SEANCES_CSV2 = ./data/seances_concatenees_2_withgroupepol.csv
 ###### 16eme legislature
 SEANCES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/vp/syceronbrut/syseron.xml.zip
 GROUPES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/amo/acteurs_mandats_organes_divises/AMO50_acteurs_mandats_organes_divises.json.zip
@@ -14,8 +15,10 @@ VOTES_DIR = ./data/raw/votes
 
 download_csv_files:
 	mkdir -p ./data
-	gsutil cp gs://le-wagon-assnat/seances_concatenees_2.csv $SEANCES_CSV
-	gsutil cp gs://le-wagon-assnat/acteur-groupe.csv $GROUPES_CSV
+	gsutil cp gs://le-wagon-assnat/acteur-groupe.csv $(GROUPES_CSV)
+	gsutil cp gs://le-wagon-assnat/seances_concatenees_2.csv $(SEANCES_CSV)
+	gsutil cp gs://le-wagon-assnat/seances_concatenees_2_withgroupepol.csv $(SEANCES_CSV2)
+
 
 download_raw_seances:
 	mkdir -p ./data
