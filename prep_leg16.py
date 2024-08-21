@@ -3,15 +3,16 @@ import json, csv
 import pandas as pd
 from utils import append_to_dict_key, list_files
 
-seances_xml_dir = './data/raw/seances/xml/compteRendu'
+seances_xml_dir = './data/raw/leg16/seances/xml/compteRendu'
 seances_csv = './data/leg16-seances.csv'
 
-votes_xml_dir = './data/raw/votes/xml'
+votes_xml_dir = './data/raw/leg16/votes/xml'
 votes_csv = './data/leg16-votes.json'
 
-mandats_dir = './data/raw/groupes/mandat'
-organes_dir = './data/raw/groupes/organe'
+mandats_dir = './data/raw/leg16/groupes/mandat'
+organes_dir = './data/raw/leg16/groupes/organe'
 famille_csv = './data/leg16-acteur-groupe-famille.csv'
+mandats_csv = './data/leg16-mandats.csv'
 
 all_csv= './data/leg16.csv'
 
@@ -134,11 +135,16 @@ def famille_parse_mandat(json_path):
     acteur_id = data['mandat']['acteurRef']
     type_organe = data['mandat']['typeOrgane']
     organe_id = data['mandat']['organes']['organeRef']
+    if 'mandature' in data['mandat']:
+        placeHemicycle = data['mandat']['mandature']['placeHemicycle'] #TODO
+    else:
+        placeHemicycle = None
 
     return {
         "acteurRef": acteur_id,
         "typeOrgane": type_organe,
-        "organeRef": organe_id
+        "organeRef": organe_id,
+        "placeHemicycle": placeHemicycle
     }
 
 # Parsing d'un fichiers JSON d'organe
@@ -161,20 +167,41 @@ def famille_parse_organe(json_path):
     }
 
 # Crée le dictionnaire des groupes parlementaires
-def famille_create_dic():
+# default is 'GP' for groupes parlementaires
+# mais le parame 'ASSEMBLEE' est aussi possible pour avoir la placeHemicycle
+def famille_create_organe_dic(typeOrgane = 'GP'):
     groupe_by_id = {}
     for json_file in list_files(organes_dir, '.json'):
         print(json_file, end='\r')
         organe = famille_parse_organe(json_file)
-        if organe['typeOrgane'] == 'GP':
+        if organe['typeOrgane'] == typeOrgane:
             organeRef = organe['organeRef']
             groupe_by_id[organeRef] = organe
     return groupe_by_id
 
+# Export the Mandats as CSV for further analysis
+def export_mandats():
+    print("Exporting mandats")
+    with open(mandats_csv, 'w', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['typeOrgane', 'organeRef', 'acteurRef','placeHemicycle']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for json_file in list_files(mandats_dir,'.json'):
+            print(json_file, end='\r')
+            mandat = famille_parse_mandat(json_file)
+            if mandat['typeOrgane'] != 'ASSEMBLEE':
+                continue
+            writer.writerow({'typeOrgane':mandat['typeOrgane'],
+                             'organeRef':mandat['organeRef'],
+                             'acteurRef':mandat['acteurRef'],
+                             'placeHemicycle': mandat.get('placeHemicycle','')
+                             })
+    print(f"✅ Success : {mandats_csv}")
 
+# Crée le fichier CSV des acteurs avec groupe et famille
 def famille_parse():
     print("Family parsing")
-    groupes = famille_create_dic()
+    groupes = famille_create_organe_dic('GP')
     acteur_groupes={}
     for json_file in list_files(mandats_dir,'.json'):
         print(json_file, end='\r')
@@ -207,7 +234,7 @@ def famille_parse():
     print(f"✅ Success : {famille_csv}")
 
 
-def pack():
+def all_parse():
     print("Packing all data")
     seances = pd.read_csv(seances_csv)
     seances["ID Orateur"]=seances["ID Orateur"].astype(str)
@@ -223,4 +250,5 @@ if __name__ == "__main__":
     seances_parse()
     votes_parse()
     famille_parse()
-    pack()
+    all_parse()
+    export_mandats()
