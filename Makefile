@@ -1,20 +1,23 @@
-GROUPES_CSV = ./data/acteur-groupe.csv
-SEANCES_CSV = ./data/seances_concatenees_2.csv
-SEANCES_CSV2 = ./data/seances_concatenees_2_withgroupepol.csv
-VOTES_JSON = ./data/votes.json
-###### 16eme legislature
-SEANCES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/vp/syceronbrut/syseron.xml.zip
-GROUPES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/amo/acteurs_mandats_organes_divises/AMO50_acteurs_mandats_organes_divises.json.zip
-VOTES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/loi/scrutins/Scrutins.xml.zip
+LEG16_SEANCES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/vp/syceronbrut/syseron.xml.zip
+LEG16_SEANCES_ZIP = ./data/raw/leg16/syseron.xml.zip
+LEG16_SEANCES_DIR = ./data/raw/leg16/seances
+LEG16_VOTES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/loi/scrutins/Scrutins.xml.zip
+LEG16_VOTES_ZIP = ./data/raw/leg16/votes.xml.zip
+LEG16_VOTES_DIR = ./data/raw/leg16/votes
+LEG16_GROUPES_URL = https://data.assemblee-nationale.fr/static/openData/repository/16/amo/acteurs_mandats_organes_divises/AMO50_acteurs_mandats_organes_divises.json.zip
+LEG16_GROUPES_ZIP = ./data/raw/leg16/groupes.xml.zip
+LEG16_GROUPES_DIR = ./data/raw/leg16/groupes
 
-SEANCES_ZIP = ./data/syseron.xml.zip
-SEANCES_DIR = ./data/raw/seances
-GROUPES_ZIP = ./data/groupes.xml.zip
-GROUPES_DIR = ./data/raw/groupes
-VOTES_ZIP = ./data/votes.xml.zip
-VOTES_DIR = ./data/raw/votes
+LEG15_SEANCES_URL = https://data.assemblee-nationale.fr/static/openData/repository/15/vp/syceronbrut/syseron.xml.zip
+LEG15_SEANCES_ZIP = ./data/raw/leg15/syseron.xml.zip
+LEG15_SEANCES_DIR = ./data/raw/leg15/seances
+LEG15_GROUPES_URL = https://data.assemblee-nationale.fr/static/openData/repository/15/amo/deputes_senateurs_ministres_legislature/AMO20_dep_sen_min_tous_mandats_et_organes_XV.xml.zip
+LEG15_GROUPES_ZIP = ./data/raw/leg15/AMO20_dep_sen_min_tous_mandats_et_organes_XV.xml.zip
+LEG15_GROUPES_DIR = ./data/raw/leg15/groupes
 
-push_csv_files:
+https://data.assemblee-nationale.fr/static/openData/repository/15/amo/deputes_senateurs_ministres_legislature/AMO20_dep_sen_min_tous_mandats_et_organes_XV.xml.zip
+
+push_leg16_files:
 	mkdir -p ./data
 	gsutil cp data/leg16-acteur-groupe-famille.csv gs://le-wagon-assnat/
 	gsutil cp data/leg16-votes.json gs://le-wagon-assnat/
@@ -28,23 +31,35 @@ download_leg16_files:
 	gsutil cp gs://le-wagon-assnat/leg16-seances.csv data/
 	gsutil cp gs://le-wagon-assnat/leg16.csv data/
 
-download_raw_seances:
-	mkdir -p ./data
-	mkdir -p $(SEANCES_DIR)
-	curl -o $(SEANCES_ZIP) $(SEANCES_URL)
-	unzip -o $(SEANCES_ZIP) -d $(SEANCES_DIR)
-	rm -f $(SEANCES_ZIP)
+download_leg16_raw_files:
+	mkdir -p ./data/leg16
 
-download_raw_groupes:
-	mkdir -p ./data
-	mkdir -p $(GROUPES_DIR)
-	curl -o $(GROUPES_ZIP) $(GROUPES_URL)
-	unzip -o $(GROUPES_ZIP) -d $(GROUPES_DIR)
-	rm -f $(GROUPES_ZIP)
+	mkdir -p $(LEG16_SEANCES_DIR)
+	curl -o $(LEG16_SEANCES_ZIP) $(LEG16_SEANCES_URL)
+	unzip -o $(LEG16_SEANCES_ZIP) -d $(LEG16_SEANCES_DIR)
+	rm -f $(LEG16_SEANCES_ZIP)
 
-download_raw_votes:
-	mkdir -p ./data
-	mkdir -p $(VOTES_DIR)
-	curl -o $(VOTES_ZIP) $(VOTES_URL)
-	unzip -o $(VOTES_ZIP) -d $(VOTES_DIR)
-	rm -f $(VOTES_ZIP)
+
+	mkdir -p $(LEG16_GROUPES_DIR)
+	curl -o $(LEG16_GROUPES_ZIP) $(LEG16_GROUPES_URL)
+	unzip -o $(LEG16_GROUPES_ZIP) -d $(LEG16_GROUPES_DIR)
+	rm -f $(LEG16_GROUPES_ZIP)
+
+
+	mkdir -p $(LEG16_VOTES_DIR)
+	curl -o $(LEG16_VOTES_ZIP) $(LEG16_VOTES_URL)
+	unzip -o $(LEG16_VOTES_ZIP) -d $(LEG16_VOTES_DIR)
+	rm -f $(LEG16_VOTES_ZIP)
+
+download_leg15_raw_files:
+	mkdir -p ./data/raw/leg15
+
+	mkdir -p $(LEG15_SEANCES_DIR)
+	curl -o $(LEG15_SEANCES_ZIP) $(LEG15_SEANCES_URL)
+	unzip -o $(LEG15_SEANCES_ZIP) -d $(LEG15_SEANCES_DIR)
+	rm -f $(LEG15_SEANCES_ZIP)
+
+	mkdir -p $(LEG15_GROUPES_DIR)
+	curl -o $(LEG15_GROUPES_ZIP) $(LEG15_GROUPES_URL)
+	unzip -o $(LEG15_GROUPES_ZIP) -d $(LEG15_GROUPES_DIR)
+	rm -f $(LEG15_GROUPES_ZIP)
