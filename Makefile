@@ -21,7 +21,7 @@ push_csv_files:
 	gsutil cp data/leg16-seances.csv gs://le-wagon-assnat/
 	gsutil cp data/leg16.csv gs://le-wagon-assnat/
 
-download_csv_files:
+download_leg16_files:
 	mkdir -p ./data
 	gsutil cp gs://le-wagon-assnat/leg16-acteur-groupe-famille.csv data/
 	gsutil cp gs://le-wagon-assnat/leg16-votes.json data/
