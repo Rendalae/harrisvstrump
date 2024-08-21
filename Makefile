@@ -18,11 +18,10 @@ LEG15_GROUPES_DIR = ./data/raw/leg15/groupes
 https://data.assemblee-nationale.fr/static/openData/repository/15/amo/deputes_senateurs_ministres_legislature/AMO20_dep_sen_min_tous_mandats_et_organes_XV.xml.zip
 
 push_leg16_files:
-	mkdir -p ./data
-	gsutil cp data/leg16-acteur-groupe-famille.csv gs://le-wagon-assnat/
-	gsutil cp data/leg16-votes.json gs://le-wagon-assnat/
-	gsutil cp data/leg16-seances.csv gs://le-wagon-assnat/
-	gsutil cp data/leg16.csv gs://le-wagon-assnat/
+	gsutil cp -Z data/leg16-acteur-groupe-famille.csv gs://le-wagon-assnat/
+	gsutil cp -Z data/leg16-votes.json gs://le-wagon-assnat/
+	gsutil cp -Z data/leg16-seances.csv gs://le-wagon-assnat/
+	gsutil cp -Z data/leg16.csv gs://le-wagon-assnat/
 
 download_leg16_files:
 	mkdir -p ./data
@@ -51,6 +50,18 @@ download_leg16_raw_files:
 	unzip -o $(LEG16_VOTES_ZIP) -d $(LEG16_VOTES_DIR)
 	rm -f $(LEG16_VOTES_ZIP)
 
+
+push_leg15_files:
+	gsutil cp -Z data/leg15-acteur-groupe-famille.csv gs://le-wagon-assnat/
+	gsutil cp -Z data/leg15-seances.csv gs://le-wagon-assnat/
+	gsutil cp -Z data/leg15.csv gs://le-wagon-assnat/
+
+download_leg15_files:
+	gsutil cp gs://le-wagon-assnat/leg15-acteur-groupe-famille.csv data/
+	gsutil cp gs://le-wagon-assnat/leg15-seances.csv data/
+	gsutil cp gs://le-wagon-assnat/leg15.csv data/
+
+
 download_leg15_raw_files:
 	mkdir -p ./data/raw/leg15
 
@@ -63,3 +74,10 @@ download_leg15_raw_files:
 	curl -o $(LEG15_GROUPES_ZIP) $(LEG15_GROUPES_URL)
 	unzip -o $(LEG15_GROUPES_ZIP) -d $(LEG15_GROUPES_DIR)
 	rm -f $(LEG15_GROUPES_ZIP)
+
+reset_data_dir:
+	@read -p "!!! This will completely delete the ./data directory and download fresh CSV files. Are you sure ? Press ctrl+c to abort or any key to continue" confirmation
+	rm -rf ./data
+	mkdir -p ./data
+	make download_leg16_files
+	make download_leg15_files
