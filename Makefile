@@ -21,7 +21,6 @@ download_csv_files:
 	gsutil cp gs://le-wagon-assnat/seances_concatenees_2_withgroupepol.csv $(SEANCES_CSV2)
 	gsutil cp gs://le-wagon-assnat/votes.json $(VOTES_JSON)
 
-
 download_raw_seances:
 	mkdir -p ./data
 	mkdir -p $(SEANCES_DIR)
