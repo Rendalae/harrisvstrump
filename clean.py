@@ -19,10 +19,11 @@ def drop_certain_names(df,names): #Removes names you choose
 def remove_short_sentences(df, n): #Removes sentences with less than n words
     def word_count(sentence):
         return len(sentence.split())
+    df['Texte'] = df['Texte'].astype(str)
     df = df[df['Texte'].apply(word_count) >= n]
     return df
 
-def apply_preprocessing(df, punct_opt = True): #applies the preprocessing, if punct_opt = True includes '!?'
+def create_word_sequence(df, punct_opt = True): #applies the preprocessing, if punct_opt = True includes '!?'
 
     def preprocessing(sentence, punct_option = True):
         # Removing whitespaces
@@ -39,18 +40,4 @@ def apply_preprocessing(df, punct_opt = True): #applies the preprocessing, if pu
         return sentence
     df['Texte'] = df['Texte'].apply(preprocessing)
     df['Texte'] = df['Texte'].apply(text_to_word_sequence,filters=string.punctuation.replace('?','').replace('!',''), lower=True, split=' ')
-    return df
-
-def complete_preproc(df, drop_col=[], na_col= [] , drop_names = [] , min_words= 6, punct_opt=True):
-
-    df = df.drop(columns=drop_col) #drop columns with parameters you do not want
-
-    df = drop_na(df, na_col) #Removes Nan from specific column
-
-    df = drop_certain_names(df, drop_names) #Removes names you choose
-
-    df = remove_short_sentences(df, min_words) #Removes sentences with less than n words
-
-    df = apply_preprocessing(df, punct_opt=punct_opt) #applies the preprocessing, if punct_opt = True includes '!?'
-
     return df
