@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import csv
 import pandas as pd
-from utils import list_files
+from utils import append_to_dict_key, list_files
 
 seances_xml_dir = './data/raw/leg15/seances/xml/compteRendu'
 seances_csv = './data/leg15-seances.csv'
@@ -13,6 +13,40 @@ famille_csv = './data/leg15-acteur-groupe-famille.csv'
 all_csv= './data/leg15.csv'
 
 ns = {'ns': 'http://schemas.assemblee-nationale.fr/referentiel'}
+
+famille_by_groupe = {
+    "LAREM": "Centre",
+    "HOR": "Centre-droit",
+    "UDI": "Centre-droit",
+    "NI": "Variable",
+    "RN": "Extrême droite",
+    "LR": "Droite",
+    "UDI_I": "Centre-droit",
+    "NG": "Gauche",
+    "SOC": "Gauche",
+    "RE": "Centre",
+    "SRC": "Gauche",
+    "DEM": "Centre",
+    "MODEM": "Centre",
+    "ECOLO": "Gauche",
+    "GDR": "Gauche",
+    "UDI-AGIR": "Centre-droit",
+    "UMP": "Droite",
+    "SER": "Gauche",
+    "LC": "Centre",
+    "LFI-NUPES": "Extrême gauche",
+    "LES-REP": "Droite",
+    "GDR-NUPES": "Gauche",
+    "LIOT": "Centre",
+    "UDI-I": "Centre-droit",
+    "UDI-A-I": "Centre-droit",
+    "R-UMP": "Droite",
+    "FI": "Extrême gauche",
+    "AGIR-E": "Centre-droit",
+    "RRDP": "Centre-gauche",
+    "LT": "Centre",
+    "EDS": "Centre-gauche"
+}
 
 def seances_parse():
     print("Seances parsing")
@@ -50,7 +84,7 @@ def seances_parse():
     print(f"✅ Success : {seances_csv}")
 
 
-def famille_parse_acteur(xml_file):
+def famille_parse_acteur_mandats(xml_file):
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
@@ -67,8 +101,8 @@ def famille_parse_acteur(xml_file):
 
         # Ajouter les données extraites à la liste
         acteur_mandats.append( {
-            'acteur_id': acteur_id,
-            'organe_id': organe_id,
+            'acteurRef': acteur_id,
+            'organeRef': organe_id,
             'date_debut': date_debut,
             'date_fin': date_fin,
             'qualite': qualite
@@ -89,33 +123,79 @@ def famille_parse_organe(xml_file):
 
     # Ajouter les données extraites à la liste
     return {
-        'uid': uid,
-        'code_type': code_type,
+        'organeRef': uid,
+        'typeOrgane': code_type,
         'libelle': libelle,
         'libelle_abrev': libelle_abrev,
         'date_debut': date_debut,
         'date_fin': date_fin
     }
 
+# Crée le dictionnaire des groupes parlementaires
+# default is 'GP' for groupes parlementaires
+# mais le parame 'ASSEMBLEE' est aussi possible pour avoir la placeHemicycle
+def famille_create_organe_dic(typeOrgane = 'GP'):
+    groupe_by_id = {}
+    for json_file in list_files(organes_dir, '.xml'):
+        print(json_file, end='\r')
+        organe = famille_parse_organe(json_file)
+        if organe['typeOrgane'] == typeOrgane:
+            organeRef = organe['organeRef']
+            groupe_by_id[organeRef] = organe
+    return groupe_by_id
+
+
+# Crée le fichier CSV des acteurs avec groupe et famille
 def famille_parse():
-    print("Familles parsing")
-    acteurs=[]
-    for acteurs_file in list_files(acteurs_dir, '.xml'):
-        acteurs+=famille_parse_acteur(acteurs_file)
-    organes=[]
-    for organes_file in list_files(organes_dir, '.xml'):
-        organes.append(famille_parse_organe(organes_file))
+    print("Family parsing")
+    organes = famille_create_organe_dic('GP')
+    acteur_groupes={}
+    for xml_file in list_files(acteurs_dir,'.xml'):
+        for mandat in famille_parse_acteur_mandats(xml_file):
+            organeRef = mandat['organeRef']
+            acteur_ref = mandat['acteurRef']
+            if not organeRef in organes:
+                continue
+            organe = organes[organeRef]
+            groupe_code=organe['libelle_abrev']
+            append_to_dict_key(acteur_groupes, acteur_ref, groupe_code)
 
-    acteurs_df = pd.DataFrame.from_records(acteurs)
-    organes_df = pd.DataFrame.from_records(organes)
-    merged_df = acteurs_df.merge(organes_df, left_on='organe_id', right_on='uid', how='left')
-    final_df = merged_df[['acteur_id', 'organe_id', 'date_debut_x', 'date_fin_x', 'qualite', 'libelle', 'code_type','libelle_abrev']]
-    final_df = final_df.rename(columns={'libelle': 'groupe_politique', 'libelle_abrev': 'groupe_abrege'})
-    final_df.to_csv(famille_csv, index=False, encoding='utf-8')
+    groupe_famille_by_acteur=[]
+    for acteur, organes in acteur_groupes.items():
+        final_groupe='NI'
+        for organe in organes:
+            if(organe!='NI'):
+                final_groupe=organe
+                # On prend le premier groupe qui n'est pas NI !!!!!
+                break
+        if final_groupe in famille_by_groupe:
+            famille = famille_by_groupe[final_groupe]
+        else:
+            print(f"⚠️⚠️⚠️ Missing group {final_groupe}")
+            famille = "NA"
+        groupe_famille_by_acteur.append( {'ID Orateur': acteur[2:],'groupe':organe, 'famille': famille})
 
+    with open(famille_csv, 'w', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['ID Orateur', 'groupe', 'famille']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for entry in groupe_famille_by_acteur:
+            writer.writerow(entry)
     print(f"✅ Success : {famille_csv}")
+
+def all_parse():
+    print("Packing all data")
+    seances = pd.read_csv(seances_csv)
+    seances["ID Orateur"]=seances["ID Orateur"].astype(str)
+    acteur_famille=pd.read_csv(famille_csv)
+    acteur_famille=acteur_famille[["ID Orateur", "famille"]]
+    acteur_famille=acteur_famille.astype(str)
+    all= seances.merge(acteur_famille, on="ID Orateur", how="left")
+    all.to_csv(all_csv, index=False)
+    print(f"✅ Success : {all_csv}")
 
 
 if __name__ == "__main__":
     #seances_parse()
-    famille_parse()
+    #famille_parse()
+    all_parse()
