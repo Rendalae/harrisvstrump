@@ -14,12 +14,19 @@ GROUPES_DIR = ./data/raw/groupes
 VOTES_ZIP = ./data/votes.xml.zip
 VOTES_DIR = ./data/raw/votes
 
+push_csv_files:
+	mkdir -p ./data
+	gsutil cp data/leg16-acteur-groupe-famille.csv gs://le-wagon-assnat/
+	gsutil cp data/leg16-votes.json gs://le-wagon-assnat/
+	gsutil cp data/leg16-seances.csv gs://le-wagon-assnat/
+	gsutil cp data/leg16.csv gs://le-wagon-assnat/
+
 download_csv_files:
 	mkdir -p ./data
-	gsutil cp gs://le-wagon-assnat/acteur-groupe.csv $(GROUPES_CSV)
-	gsutil cp gs://le-wagon-assnat/seances_concatenees_2.csv $(SEANCES_CSV)
-	gsutil cp gs://le-wagon-assnat/seances_concatenees_2_withgroupepol.csv $(SEANCES_CSV2)
-	gsutil cp gs://le-wagon-assnat/votes.json $(VOTES_JSON)
+	gsutil cp gs://le-wagon-assnat/leg16-acteur-groupe-famille.csv data/
+	gsutil cp gs://le-wagon-assnat/leg16-votes.json data/
+	gsutil cp gs://le-wagon-assnat/leg16-seances.csv data/
+	gsutil cp gs://le-wagon-assnat/leg16.csv data/
 
 download_raw_seances:
 	mkdir -p ./data
