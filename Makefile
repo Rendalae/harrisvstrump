@@ -81,3 +81,6 @@ reset_data_dir:
 	mkdir -p ./data
 	make download_leg16_files
 	make download_leg15_files
+
+preprocess_data:
+	python -c 'from main import complete_preproc; complete_preproc()'
