@@ -1,8 +1,8 @@
 import pandas as pd
-from clean import drop_na, drop_certain_names, remove_short_sentences, create_word_sequence
+from preprocess import drop_na, drop_certain_names, remove_short_sentences, create_word_sequence
 from params import *
 
-def complete_preproc(drop_col = DROP_COL, na_col = NA_COL , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
+def complete_preproc(drop_col = DROP_COL, na_col = NA_COL , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT, word_seq = False):
 
     df = pd.read_csv('data/leg16.csv')
     print('Upload achieved')
@@ -27,7 +27,7 @@ def complete_preproc(drop_col = DROP_COL, na_col = NA_COL , drop_names = DROP_NA
     print('Short sentences removed')
     print(df.head())
 
-    df = create_word_sequence(df, punct_opt=punct_opt) #applies the preprocessing, if punct_opt = True includes '!?'
+    df = create_word_sequence(df, punct_opt=punct_opt, word_seq=word_seq) #applies the preprocessing, if punct_opt = True includes '!?'
     print(df.head())
     print('Preprocessing done!')
 
