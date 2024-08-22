@@ -9,10 +9,14 @@ from tensorflow.keras.preprocessing.text import text_to_word_sequence
 from assnat.params import *
 
 
-def complete_preproc(df, drop_col = DROP_COLS, na_col = NA_COLS , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
+def complete_preproc(df, drop_col = DROP_COLS, drop_fam = DROP_FAM, na_col = NA_COLS , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
     if len(drop_col)>0:
         df = df.drop(columns= drop_col) #drop columns with parameters you do not want
     print('Columns dropped')
+    #print(df.head())
+
+    df = drop_certain_families(df, drop_fam)
+    print('family dropped')
     #print(df.head())
 
     df = drop_na(df, na_col) #Removes Nan from specific column
@@ -33,7 +37,10 @@ def complete_preproc(df, drop_col = DROP_COLS, na_col = NA_COLS , drop_names = D
 
     return df
 
-
+def drop_certain_families(df,family): # Removes families you choose
+    if len(family)>0:
+        df = df[~df['famille'].isin(family)]
+    return df
 
 def drop_na(df, column): #Removes Nan from specific column
     if len(column)>0:

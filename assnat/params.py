@@ -1,6 +1,7 @@
 import os
 
 DROP_COLS= []
+DROP_FAM = []
 NA_COLS= []
 DROP_NAMES = []
 MIN_WORDS= 6
