@@ -1,6 +1,7 @@
 import pandas as pd
-from clean import drop_na, drop_certain_names, remove_short_sentences, create_word_sequence
-from params import *
+from assnat.clean import drop_na, drop_certain_names, remove_short_sentences, create_word_sequence
+from assnat.params import *
+
 
 def complete_preproc(drop_col = DROP_COL, na_col = NA_COL , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
 
@@ -8,9 +9,7 @@ def complete_preproc(drop_col = DROP_COL, na_col = NA_COL , drop_names = DROP_NA
     print('Upload achieved')
     print(df.head())
 
-    if drop_col == '' or drop_col == [] or drop_col == None:
-       df = df
-    else:
+    if drop_col:
         df = df.drop(columns= drop_col) #drop columns with parameters you do not want
     print('Columns dropped')
     print(df.head())

@@ -31,7 +31,7 @@ def remove_short_sentences(df, n): #Removes sentences with less than n words
 
 # Turn dates into years
 
-def create_word_sequence(df, punct_opt = True): #applies the preprocessing, if punct_opt = True keeps '!?'
+def create_word_sequence(df, punct_opt = True, text_to_sequence = False): #applies the preprocessing, if punct_opt = True keeps '!?'
 
     def preprocessing(sentence, punct_option = True):
         # Removing whitespaces
@@ -46,6 +46,10 @@ def create_word_sequence(df, punct_opt = True): #applies the preprocessing, if p
             for punctuation in string.punctuation:
                 sentence = sentence.replace(punctuation, '')
         return sentence
+
     df['Texte'] = df['Texte'].apply(preprocessing)
-    df['Texte'] = df['Texte'].apply(text_to_word_sequence,filters=string.punctuation.replace('?','').replace('!',''), lower=True, split=' ')
+    print(type(df['Texte']))
+    if text_to_sequence:
+        print('text_to_sequence')
+        df['Texte'] = df['Texte'].apply(text_to_word_sequence,filters=string.punctuation.replace('?','').replace('!',''), lower=True, split=' ')
     return df

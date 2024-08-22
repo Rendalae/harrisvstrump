@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as ET
 import json, csv
 import pandas as pd
-from params import FAMILLES_BY_GROUPE
-from utils import append_to_dict_key, list_files
+from assnat.params import FAMILLES_BY_GROUPE
+from assnat.utils import append_to_dict_key, list_files
 
 seances_xml_dir = './data/raw/leg16/seances/xml/compteRendu'
 seances_csv = './data/leg16-seances.csv'
