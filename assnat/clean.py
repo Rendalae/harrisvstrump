@@ -9,16 +9,12 @@ from tensorflow.keras.preprocessing.text import text_to_word_sequence
 
 
 def drop_na(df, column): #Removes Nan from specific column
-    if column == '' or column == [] or column == None:
-        df = df
-    else:
+    if len(column)>0:
         df = df.dropna(subset = column)
     return df
 
 def drop_certain_names(df,names): #Removes names you choose
-    if names == '' or names == [] or names == None:
-        df = df
-    else:
+    if len(names)>0:
         df = df[~df['Nom Orateur'].isin(names)]
     return df
 
@@ -48,8 +44,6 @@ def create_word_sequence(df, punct_opt = True, text_to_sequence = False): #appli
         return sentence
 
     df['Texte'] = df['Texte'].apply(preprocessing)
-    print(type(df['Texte']))
     if text_to_sequence:
-        print('text_to_sequence')
         df['Texte'] = df['Texte'].apply(text_to_word_sequence,filters=string.punctuation.replace('?','').replace('!',''), lower=True, split=' ')
     return df
