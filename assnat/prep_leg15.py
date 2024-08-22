@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import csv
 import pandas as pd
+from params import FAMILLES_BY_GROUPE
 from utils import append_to_dict_key, list_files
 
 seances_xml_dir = './data/raw/leg15/seances/xml/compteRendu'
@@ -10,43 +11,10 @@ acteurs_dir = './data/raw/leg15/groupes/xml/acteur'
 organes_dir = './data/raw/leg15/groupes/xml/organe'
 famille_csv = './data/leg15-acteur-groupe-famille.csv'
 
-all_csv= './data/leg15.csv'
+all_csv= './data/leg15-without-family.csv'
 
 ns = {'ns': 'http://schemas.assemblee-nationale.fr/referentiel'}
 
-famille_by_groupe = {
-    "LAREM": "Centre",
-    "HOR": "Centre-droit",
-    "UDI": "Centre-droit",
-    "NI": "Variable",
-    "RN": "Extrême droite",
-    "LR": "Droite",
-    "UDI_I": "Centre-droit",
-    "NG": "Gauche",
-    "SOC": "Gauche",
-    "RE": "Centre",
-    "SRC": "Gauche",
-    "DEM": "Centre",
-    "MODEM": "Centre",
-    "ECOLO": "Gauche",
-    "GDR": "Gauche",
-    "UDI-AGIR": "Centre-droit",
-    "UMP": "Droite",
-    "SER": "Gauche",
-    "LC": "Centre",
-    "LFI-NUPES": "Extrême gauche",
-    "LES-REP": "Droite",
-    "GDR-NUPES": "Gauche",
-    "LIOT": "Centre",
-    "UDI-I": "Centre-droit",
-    "UDI-A-I": "Centre-droit",
-    "R-UMP": "Droite",
-    "FI": "Extrême gauche",
-    "AGIR-E": "Centre-droit",
-    "RRDP": "Centre-gauche",
-    "LT": "Centre",
-    "EDS": "Centre-gauche"
-}
 
 def seances_parse():
     print("Seances parsing")
@@ -168,8 +136,8 @@ def famille_parse():
                 final_groupe=organe
                 # On prend le premier groupe qui n'est pas NI !!!!!
                 break
-        if final_groupe in famille_by_groupe:
-            famille = famille_by_groupe[final_groupe]
+        if final_groupe in FAMILLES_BY_GROUPE:
+            famille = FAMILLES_BY_GROUPE[final_groupe]
         else:
             print(f"⚠️⚠️⚠️ Missing group {final_groupe}")
             famille = "NA"

@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import json, csv
 import pandas as pd
+from params import FAMILLES_BY_GROUPE
 from utils import append_to_dict_key, list_files
 
 seances_xml_dir = './data/raw/leg16/seances/xml/compteRendu'
@@ -14,43 +15,9 @@ organes_dir = './data/raw/leg16/groupes/organe'
 famille_csv = './data/leg16-acteur-groupe-famille.csv'
 mandats_csv = './data/leg16-mandats.csv'
 
-all_csv= './data/leg16.csv'
+all_csv= './data/leg16-without-family.csv'
 
 ns = {'ns': 'http://schemas.assemblee-nationale.fr/referentiel'}
-
-famille_by_groupe = {
-    "LAREM": "Centre",
-    "HOR": "Centre-droit",
-    "UDI": "Centre-droit",
-    "NI": "Variable",
-    "RN": "Extrême droite",
-    "LR": "Droite",
-    "UDI_I": "Centre-droit",
-    "NG": "Gauche",
-    "SOC": "Gauche",
-    "RE": "Centre",
-    "SRC": "Gauche",
-    "DEM": "Centre",
-    "MODEM": "Centre",
-    "ECOLO": "Gauche",
-    "GDR": "Gauche",
-    "UDI-AGIR": "Centre-droit",
-    "UMP": "Droite",
-    "SER": "Gauche",
-    "LC": "Centre",
-    "LFI-NUPES": "Extrême gauche",
-    "LES-REP": "Droite",
-    "GDR-NUPES": "Gauche",
-    "LIOT": "Centre",
-    "UDI-I": "Centre-droit",
-    "UDI-A-I": "Centre-droit",
-    "R-UMP": "Droite",
-    "FI": "Extrême gauche",
-    "AGIR-E": "Centre-droit",
-    "RRDP": "Centre-gauche",
-    "LT": "Centre",
-    "EDS": "Centre-gauche"
-}
 
 def seances_parse():
     print("Seances parsing")
@@ -220,9 +187,9 @@ def famille_parse():
                 final_groupe=groupe
                 # On prend le premier groupe qui n'est pas NI !!!!!
                 break
-        if not final_groupe in famille_by_groupe:
+        if not final_groupe in FAMILLES_BY_GROUPE:
             print(f"⚠️⚠️⚠️ Missing group {final_groupe}")
-        famille = famille_by_groupe[final_groupe]
+        famille = FAMILLES_BY_GROUPE[final_groupe]
         groupe_famille_by_acteur.append( {'ID Orateur': acteur[2:] ,'groupe':groupe, 'famille': famille})
 
     with open(famille_csv, 'w', newline='', encoding='utf-8') as csvfile:
@@ -247,8 +214,8 @@ def all_parse():
 
 
 if __name__ == "__main__":
-    seances_parse()
-    votes_parse()
-    famille_parse()
+    #seances_parse()
+    #votes_parse()
+    #famille_parse()
     all_parse()
-    export_mandats()
+    #export_mandats()

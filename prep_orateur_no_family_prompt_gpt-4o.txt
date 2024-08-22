@@ -1,0 +1,12 @@
+voici un CSV, ajoute une colonne contenant au choix l'information suivante :
+Extrême droite
+Droite
+Centre-droit
+Centre
+Centre-gauche
+Gauche
+Extrême gauche
+
+---- CSV
+
+[CSV ICI]
