@@ -6,6 +6,33 @@ import seaborn as sns
 import string
 import tensorflow_datasets as tfds
 from tensorflow.keras.preprocessing.text import text_to_word_sequence
+from assnat.params import *
+
+
+def complete_preproc(df, drop_col = DROP_COLS, na_col = NA_COLS , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
+    if len(drop_col)>0:
+        df = df.drop(columns= drop_col) #drop columns with parameters you do not want
+    print('Columns dropped')
+    #print(df.head())
+
+    df = drop_na(df, na_col) #Removes Nan from specific column
+    print('NaN dropped')
+    #print(df.head())
+
+    df = drop_certain_names(df, drop_names) #Removes names you choose
+    print('Names dropped')
+    #print(df.head())
+
+    df = remove_short_sentences(df, min_words) #Removes sentences with less than n words
+    print('Short sentences removed')
+    #print(df.head())
+
+    df = create_word_sequence(df, punct_opt=punct_opt) #applies the preprocessing, if punct_opt = True includes '!?'
+    #print(df.head())
+    print('Preprocessing done!')
+
+    return df
+
 
 
 def drop_na(df, column): #Removes Nan from specific column

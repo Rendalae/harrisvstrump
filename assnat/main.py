@@ -1,32 +1,5 @@
+from assnat.clean import complete_preproc
 import pandas as pd
-from assnat.clean import drop_na, drop_certain_names, remove_short_sentences, create_word_sequence
-from assnat.params import *
 
-
-def complete_preproc(drop_col = DROP_COLS, na_col = NA_COLS , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
-    df = pd.read_csv('data/leg16.csv')
-    print('Upload achieved')
-    #print(df.head())
-
-    if len(drop_col)>0:
-        df = df.drop(columns= drop_col) #drop columns with parameters you do not want
-    print('Columns dropped')
-    #print(df.head())
-
-    df = drop_na(df, na_col) #Removes Nan from specific column
-    print('NaN dropped')
-    #print(df.head())
-
-    df = drop_certain_names(df, drop_names) #Removes names you choose
-    print('Names dropped')
-    #print(df.head())
-
-    df = remove_short_sentences(df, min_words) #Removes sentences with less than n words
-    print('Short sentences removed')
-    #print(df.head())
-
-    df = create_word_sequence(df, punct_opt=punct_opt) #applies the preprocessing, if punct_opt = True includes '!?'
-    #print(df.head())
-    print('Preprocessing done!')
-
-    return df
+df = pd.read_csv('data/leg16.csv')
+df = complete_preproc(df, na_col = ['Texte'], drop_names = ['Mme la présidente', 'M. le président'], min_words = 6, punct_opt= True)
