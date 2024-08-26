@@ -16,4 +16,4 @@ def first_model(X_train, y_train):
 
     return model
 
-fit_predict(first_model, 'leg15', 5, 10, 64)
+fit_predict(first_model, 'leg15', 5, 10, 64, tokenize=True)

@@ -48,7 +48,7 @@ def load_X_y(leg_choice_key, min_n_words=30):
 
 
 
-def tokenize_X(X_train, X_test, y_train, y_test, max_words = 5000, pad_max_len=200):
+def tokenize_X(X_train, X_test, max_words = 5000, pad_max_len=200):
     print('Tokenizing data')
 
     tokenizer = Tokenizer(num_words=max_words, oov_token='<OOV>')
@@ -62,13 +62,20 @@ def tokenize_X(X_train, X_test, y_train, y_test, max_words = 5000, pad_max_len=2
 
     print('Data tokenized')
 
-    return X_train_pad, X_test_pad, y_train, y_test
+    return X_train_pad, X_test_pad
 
 
 
-def fit_predict(create_model : Callable[[any, any],Model], leg_choice_key, patience, epochs, batch_size):
+def fit_predict(create_model : Callable[[any, any],Model], leg_choice_key,
+                patience, epochs, batch_size,
+                tokenize=False,
+                min_n_words=30,
+                tok_max_words = 5000, tok_pad_max_len=200):
 
-    X_train, X_test, y_train, y_test = tokenize_X(*load_X_y(leg_choice_key))
+    X_train, X_test, y_train, y_test = load_X_y(leg_choice_key, min_n_words=min_n_words)
+
+    if tokenize:
+        X_train, X_test = tokenize_X(X_train, X_test, max_words=tok_max_words, pad_max_len=tok_pad_max_len)
 
     print('Creating model')
     model = create_model(X_train, y_train)
