@@ -20,7 +20,10 @@ from sklearn.preprocessing import FunctionTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
 import pandas as pd
 
+import os
 
+import tensorflow as tf
+from tensorflow import keras
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report
@@ -30,6 +33,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, SpatialDropout1D
 from tensorflow.keras.callbacks import EarlyStopping
 import numpy as np
+# Include the epoch in the file name (uses `str.format`)
+
 
 
 def train_model_RNN(leg_, min_words_, patience_, epoch_, embedding_dim_, max_len_):
@@ -63,6 +68,7 @@ def train_model_RNN(leg_, min_words_, patience_, epoch_, embedding_dim_, max_len
     embedding_dim = embedding_dim_
     early_stopper = EarlyStopping(monitor='val_loss', patience=patience_, restore_best_weights=True)
 
+
     model = Sequential()
     model.add(Embedding(input_dim=max_words, output_dim=embedding_dim, input_length=max_len))
     model.add(SpatialDropout1D(0.2))
@@ -80,12 +86,25 @@ def train_model_RNN(leg_, min_words_, patience_, epoch_, embedding_dim_, max_len
     batch_size = 64
     epochs = epoch_
 
+    checkpoint_path = "training_2/cp-{epoch:04d}.ckpt" # A modifier
+    checkpoint_dir = os.path.dirname(checkpoint_path)
+
+    # Create a callback that saves the model's weights every 5 epochs
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_path,
+        verbose=1,
+        save_weights_only=True,
+        save_freq=5*batch_size)
+    # Save the weights using the `checkpoint_path` format
+    model.save_weights(checkpoint_path.format(epoch=0))
+
+
     history = model.fit(
         X_train_padded, y_train,
         epochs=epochs,
         batch_size=batch_size,
         validation_data=(X_test_padded, y_test),
-        callbacks=[early_stopper],
+        callbacks=[early_stopper], [cp_callback]
         verbose=2
     )
 
