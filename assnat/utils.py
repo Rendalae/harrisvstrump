@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 
 # Liste des fichiers JSON dans un folder
@@ -16,3 +17,9 @@ def append_to_dict_key(dict, key, val):
     if key not in dict:
         dict[key] = []
     dict[key].append(val)
+
+
+def timestamp():
+    now = datetime.now()
+    #Ex : 2024-08-26-124820
+    return now.strftime("%Y-%m-%d-%H%M%S")

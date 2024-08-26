@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from assnat.params import *
 from assnat.clean import complete_preproc
+from assnat.utils import timestamp
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import train_test_split
@@ -12,7 +13,7 @@ from sklearn.metrics import classification_report
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 import numpy as np
 import time, os
 from collections.abc import Callable
@@ -53,6 +54,8 @@ def load_X_y(leg_choice_key, min_n_words=30):
     return X_train, X_test, y_train, y_test
 
 
+def sample(n, X_train, X_test, y_train, y_test):
+    return X_train[0:n], X_test[0:n], y_train[0:n], y_test[0:n]
 
 def tokenize_X(X_train, X_test, max_words = 100000):
     print('Tokenizing data')
@@ -96,12 +99,20 @@ def fit_predict(create_model : Callable[[any, any, any, any],(Model, any, any, a
     print('Training model')
     start_time = time.time()
     early_stopper = EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True)
+
+    checkpoints_dir=f'data/checkpoints/{timestamp()}'
+    os.makedirs(checkpoints_dir, exist_ok=True)
+    checkpoints_path = checkpoints_dir+"/cp-{epoch:04d}.ckpt"
+    checkpoints = ModelCheckpoint(
+        filepath=checkpoints_path,
+        save_weights_only=True,
+        save_freq='epoch')
     model.fit(
         X_train, y_train,
         epochs=epochs,
         batch_size=batch_size,
         validation_data=(X_test, y_test),
-        callbacks=[early_stopper],
+        callbacks=[early_stopper, checkpoints],
         verbose=1
     )
     print(f'Model trained in {time.time() - start_time:,} seconds')
