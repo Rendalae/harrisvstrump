@@ -14,26 +14,32 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import EarlyStopping
 import numpy as np
-import time
+import time, os
 from collections.abc import Callable
 
 leg_choice = {
     'leg15': ['data/leg15.csv'],
     'leg16': ['data/leg16.csv'],
-    'all': ['data/leg15.csv', 'data/leg16.csv']
+    'legall': ['data/leg15.csv', 'data/leg16.csv']
 }
 
 label_encoder = LabelEncoder()
 
 def load_X_y(leg_choice_key, min_n_words=30):
-    print(f'Loading data "{leg_choice_key}"')
+    preproc_csv = f"data/{leg_choice_key}-preproc.csv"
+    if os.path.exists(preproc_csv):
+        print(f'Loading data "{leg_choice_key}" from {preproc_csv}')
+        df_preproc = pd.read_csv(preproc_csv)
+    else:
+        print(f'Loading data "{leg_choice_key}"')
+        df = pd.DataFrame()
+        for file in leg_choice[leg_choice_key]:
+            df = pd.concat([df, pd.read_csv(file)], ignore_index=True, axis=0)
+        df.reset_index(drop=True, inplace=True)
 
-    df = pd.DataFrame()
-    for file in leg_choice[leg_choice_key]:
-        df = pd.concat([df, pd.read_csv(file)], ignore_index=True, axis=0)
-    df.reset_index(drop=True, inplace=True)
-
-    df_preproc = complete_preproc(df, na_col=["Texte", "famille"], drop_names=["Mme la présidente", "M. le président"], min_words=min_n_words, punct_opt=True)
+        df_preproc = complete_preproc(df, na_col=["Texte", "famille"], drop_names=["Mme la présidente", "M. le président"], min_words=min_n_words, punct_opt=True)
+        print(f'Caching for next run to {preproc_csv}')
+        df_preproc.to_csv(preproc_csv)
 
     X = df_preproc['Texte']  # Les textes à classifier
     y = df_preproc['famille']
