@@ -1,5 +1,4 @@
-import pandas as pd
-import numpy as np
+import pandas as pdimport numpy as np
 from assnat.params import *
 from assnat.clean import complete_preproc
 import pandas as pd
@@ -64,9 +63,15 @@ def tokenize_X(X_train, X_test, max_words = 5000, pad_max_len=200):
 
     return X_train_pad, X_test_pad
 
+"""
+The argument create_model is a function that must look like this:
 
+    def embedding_lstm( X_train, X_test, y_train, y_test):
+        # Your code here
+        return model,  X_train, X_test, y_train, y_test
 
-def fit_predict(create_model : Callable[[any, any],Model], leg_choice_key,
+"""
+def fit_predict(create_model : Callable[[any, any, any, any],(Model, any, any, any, any)], leg_choice_key,
                 patience, epochs, batch_size,
                 tokenize=False,
                 min_n_words=30,
@@ -78,7 +83,7 @@ def fit_predict(create_model : Callable[[any, any],Model], leg_choice_key,
         X_train, X_test = tokenize_X(X_train, X_test, max_words=tok_max_words, pad_max_len=tok_pad_max_len)
 
     print('Creating model')
-    model = create_model(X_train, y_train)
+    model,  X_train, X_test, y_train, y_test = create_model(X_train, X_test, y_train, y_test)
     model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.summary()
 

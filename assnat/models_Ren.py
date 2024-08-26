@@ -4,7 +4,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, SpatialDropout1D
 
 
-def first_model(X_train, y_train):
+def embedding_lstm( X_train, X_test, y_train, y_test):
     model = Sequential()
     #Embedding.input_dim	Size of the vocabulary, i.e. maximum integer index + 1.
     #Embedding.output_dim	Dimension of the dense embedding.
@@ -14,6 +14,7 @@ def first_model(X_train, y_train):
     model.add(Dense(64, activation='relu'))
     model.add(Dense(len(np.unique(y_train)), activation='softmax'))
 
-    return model
+    return model,  X_train, X_test, y_train, y_test
 
-fit_predict(first_model, 'leg15', 5, 10, 64, tokenize=True)
+
+fit_predict(embedding_lstm, 'leg15', 5, 10, 64, tokenize=True)
