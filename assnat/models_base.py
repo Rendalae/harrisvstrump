@@ -1,4 +1,5 @@
-import pandas as pdimport numpy as np
+import pandas as pd
+import numpy as np
 from assnat.params import *
 from assnat.clean import complete_preproc
 import pandas as pd
@@ -25,7 +26,7 @@ leg_choice = {
 label_encoder = LabelEncoder()
 
 def load_X_y(leg_choice_key, min_n_words=30):
-    print('Loading data for', leg_choice_key)
+    print(f'Loading data "{leg_choice_key}"')
 
     df = pd.DataFrame()
     for file in leg_choice[leg_choice_key]:
@@ -64,23 +65,22 @@ def tokenize_X(X_train, X_test, max_words = 5000, pad_max_len=200):
     return X_train_pad, X_test_pad
 
 """
-The argument create_model is a function that must look like this:
+[create_model] is a function that must look like this:
 
     def embedding_lstm( X_train, X_test, y_train, y_test):
         # Your code here
         return model,  X_train, X_test, y_train, y_test
 
+[leg_choice_key] can be 'leg15', 'leg16' and 'all'
+[min_n_words] to cut off speeches with less than n words
+[patience, epochs, batch_size] are the usual parameters for the model fit
 """
-def fit_predict(create_model : Callable[[any, any, any, any],(Model, any, any, any, any)], leg_choice_key,
+def fit_predict(create_model : Callable[[any, any, any, any],(Model, any, any, any, any)],
+                leg_choice_key,
                 patience, epochs, batch_size,
-                tokenize=False,
-                min_n_words=30,
-                tok_max_words = 5000, tok_pad_max_len=200):
+                min_n_words=30):
 
     X_train, X_test, y_train, y_test = load_X_y(leg_choice_key, min_n_words=min_n_words)
-
-    if tokenize:
-        X_train, X_test = tokenize_X(X_train, X_test, max_words=tok_max_words, pad_max_len=tok_pad_max_len)
 
     print('Creating model')
     model,  X_train, X_test, y_train, y_test = create_model(X_train, X_test, y_train, y_test)

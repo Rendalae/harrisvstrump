@@ -1,10 +1,12 @@
 import numpy as np
-from assnat.models_base import fit_predict
+from assnat.models_base import fit_predict, tokenize_X
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, SpatialDropout1D
 
 
 def embedding_lstm( X_train, X_test, y_train, y_test):
+    X_train, X_test = tokenize_X(X_train, X_test, max_words=5000, pad_max_len=200)
+
     model = Sequential()
     #Embedding.input_dim	Size of the vocabulary, i.e. maximum integer index + 1.
     #Embedding.output_dim	Dimension of the dense embedding.
@@ -17,4 +19,4 @@ def embedding_lstm( X_train, X_test, y_train, y_test):
     return model,  X_train, X_test, y_train, y_test
 
 
-fit_predict(embedding_lstm, 'leg15', 5, 10, 64, tokenize=True)
+fit_predict(embedding_lstm, 'leg15', 5, 10, 64)
