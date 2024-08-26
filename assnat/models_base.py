@@ -54,7 +54,7 @@ def load_X_y(leg_choice_key, min_n_words=30):
 
 
 
-def tokenize_X(X_train, X_test, max_words = 5000, pad_max_len=200):
+def tokenize_X(X_train, X_test, max_words = 100000):
     print('Tokenizing data')
 
     tokenizer = Tokenizer(num_words=max_words, oov_token='<OOV>')
@@ -63,12 +63,12 @@ def tokenize_X(X_train, X_test, max_words = 5000, pad_max_len=200):
     X_train_seq = tokenizer.texts_to_sequences(X_train)
     X_test_seq = tokenizer.texts_to_sequences(X_test)
 
-    X_train_pad = pad_sequences(X_train_seq, maxlen=pad_max_len, padding='post', truncating='post')
-    X_test_pad = pad_sequences(X_test_seq, maxlen=pad_max_len, padding='post', truncating='post')
+    X_train_pad = pad_sequences(X_train_seq, padding='post', truncating='post')
+    X_test_pad = pad_sequences(X_test_seq, padding='post', truncating='post')
 
     print('Data tokenized')
 
-    return X_train_pad, X_test_pad
+    return X_train_pad, X_test_pad, len(tokenizer.word_index)
 
 """
 [create_model] is a function that must look like this:
@@ -102,7 +102,7 @@ def fit_predict(create_model : Callable[[any, any, any, any],(Model, any, any, a
         batch_size=batch_size,
         validation_data=(X_test, y_test),
         callbacks=[early_stopper],
-        verbose=2
+        verbose=1
     )
     print(f'Model trained in {time.time() - start_time:,} seconds')
 

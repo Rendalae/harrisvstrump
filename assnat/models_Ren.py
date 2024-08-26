@@ -5,12 +5,12 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense, SpatialDropout1D
 
 
 def embedding_lstm( X_train, X_test, y_train, y_test):
-    X_train, X_test = tokenize_X(X_train, X_test, max_words=5000, pad_max_len=200)
+    X_train, X_test, vocab_size = tokenize_X(X_train, X_test, max_words=100000)
 
     model = Sequential()
     #Embedding.input_dim	Size of the vocabulary, i.e. maximum integer index + 1.
     #Embedding.output_dim	Dimension of the dense embedding.
-    model.add(Embedding(input_dim=X_train.shape[1], output_dim=256))
+    model.add(Embedding(input_dim=vocab_size+1, output_dim=256))
     model.add(SpatialDropout1D(0.2))
     model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
     model.add(Dense(64, activation='relu'))
