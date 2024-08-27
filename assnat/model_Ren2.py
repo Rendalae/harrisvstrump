@@ -23,7 +23,7 @@ def tokenize_function(texts):
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
-    predictions = torch.argmax(logits, dim=-1)
+    predictions = torch.argmax(torch.from_numpy(logits), dim=-1)
     return {'accuracy': accuracy_score(labels, predictions)}
 
 # Entraînement
@@ -63,12 +63,43 @@ def train_model(X_train, X_test, y_train, y_test):
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
-        compute_metrics=compute_metrics
+        compute_metrics=compute_metrics,
+        data_collator=data_collator
     )
 
     trainer.train()
 
-X_train, X_test, y_train, y_test = load_X_y('leg15', min_n_words=30)
-X_train, X_test, y_train, y_test=sample(1000, X_train, X_test, y_train, y_test)
+def predict(text):
+    # Check if MPS is available
+    device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
+
+    # Tokenize the input text
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
+
+    # Move input tensors to the same device as the model
+    inputs = {key: value.to(device) for key, value in inputs.items()}
+
+    # Make sure the model is in evaluation mode
+    model.eval()
+
+    # Perform the prediction
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    # The model outputs logits, we need to convert them to probabilities and then to predicted labels
+    logits = outputs.logits
+    return torch.argmax(logits, dim=1).item()
+
+X_train, X_test, y_train, y_test =load_X_y('leg15', min_n_words=30)
+X_train, X_test, y_train, y_test=sample(100, X_train, X_test, y_train, y_test)
 
 train_model(X_train, X_test, y_train, y_test)
+
+text = "Nous devons augmenter les taxes pour les riches"
+print(f'{predict(text)} : {text}')
+
+text = "Nous devons augmenter le SMIC"
+print(f'{predict(text)} : {text}')
+
+text = "Nous devons remettre les chômeurs au travail"
+print(f'{predict(text)} : {text}')
