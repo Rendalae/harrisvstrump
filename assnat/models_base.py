@@ -26,10 +26,10 @@ leg_choice = {
 
 label_encoder = LabelEncoder()
 
-def load_X_y(leg_choice_key, min_n_words=30):
+def load_X_y(leg_choice_key, min_n_words=30, no_preproc_cache=False):
     preproc_csv = f"data/{leg_choice_key}-preproc.csv"
-    if os.path.exists(preproc_csv):
-        print(f'Loading data "{leg_choice_key}" from {preproc_csv}')
+    if os.path.exists(preproc_csv) and not no_preproc_cache:
+        print(f'Loading data "{leg_choice_key}" from cached {preproc_csv}')
         df_preproc = pd.read_csv(preproc_csv)
     else:
         print(f'Loading data "{leg_choice_key}"')

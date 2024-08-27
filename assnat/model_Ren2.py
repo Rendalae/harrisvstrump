@@ -15,7 +15,7 @@ def prepare_data(df):
 # Tokenizer et modèle
 tokenizer = CamembertTokenizer.from_pretrained("camembert-base")
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-model = CamembertForSequenceClassification.from_pretrained("camembert-base", num_labels=7)
+model = CamembertForSequenceClassification.from_pretrained("camembert-base", num_labels=8)
 
 # Tokenization
 def tokenize_function(texts):
