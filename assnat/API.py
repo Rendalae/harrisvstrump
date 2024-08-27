@@ -29,7 +29,6 @@ app.add_middleware(
 #app.state.model = pickle.load(open('modelml.pkl', 'rb'))
 
 # $WIPE_END
-
 @app.get('/')
 def root():
     model = pickle.load(open('modelml.pkl','rb'))
@@ -38,11 +37,19 @@ def root():
     print(f'here are the pRms {params}')
     return {'greetings':'hello'}
 
-@app.get('/')
+@app.get('/predict')
 def predict():
     model = pickle.load(open('modelml.pkl','rb'))
     assert model is not None
-    #X_test = pd.DataFrame({'Texte': 'Je ne suis pas)
+    X_test = pd.DataFrame({
+    'Texte': ['Les riches ne sont pas assez taxés'],
+    'Thème Séance': ['Taxes sur le revenu']
+})
+
+    X_processed = complete_preproc(X_test)
+    y_pred = model.predict(X_processed)
+    print(y_pred)
+    return dict(prediction = str(y_pred))
 
 #X_pred = pd.DataFrame(locals(), index = [0])
 
