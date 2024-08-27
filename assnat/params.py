@@ -40,3 +40,5 @@ FAMILLES_BY_GROUPE = {
     "LT": "Centre-droit",
     "EDS": "Centre-gauche"
 }
+
+TOKEN_GIF= os.environ.get("TOKEN_GIF")
