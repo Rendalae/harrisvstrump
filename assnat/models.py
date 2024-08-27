@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle as pk
 
 
-def simple_logistic_regression(legislation_number, merge_data_sets=True, drop_col = DROP_COLS, drop_fam = DROP_FAM, na_col = NA_COLS , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
+def simple_logistic_regression(legislation_number, merge_data_sets=True, simplify_family = True, drop_col = DROP_COLS, drop_fam = DROP_FAM, na_col = NA_COLS , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
     if merge_data_sets:
         data1 = pd.read_csv('data/leg15.csv')
         data2 = pd.read_csv('data/leg16.csv')
@@ -19,6 +19,19 @@ def simple_logistic_regression(legislation_number, merge_data_sets=True, drop_co
         df = pd.read_csv(f'data/leg{legislation_number}.csv')
 
     df = complete_preproc(df, drop_col= drop_col, drop_fam= drop_fam, na_col= na_col, drop_names= drop_names, min_words = min_words, punct_opt= punct_opt)
+
+    if simplify_family:
+        famille_broad = {
+    "Centre": "Centre",
+    "Centre-droit": "Centre",
+    "Centre-gauche": "Centre",
+    "Droite": "Droite",
+    "Extrême droite": "Droite",
+    "Gauche": "Gauche",
+    "Extrême gauche": "Gauche",
+    "Variable": "Variable"
+        }
+        df['famille'] = df['famille'].apply(lambda x: famille_broad.get(x, x))
 
     X_train, X_test, y_train, y_test = train_test_split(
         df[['Texte', 'Thème Séance']],
@@ -49,5 +62,5 @@ def simple_logistic_regression(legislation_number, merge_data_sets=True, drop_co
     accuracy = accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
     print(classification_report(y_test, y_pred))
-    pk.dump(model_pipeline, open('/Users/aaronviviani/code/aaronviviani/08\ -\ Project ', 'wb'))
+    pk.dump(model_pipeline, open('modelml.pkl', 'wb'))
     return accuracy
