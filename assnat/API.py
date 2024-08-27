@@ -51,6 +51,7 @@ def predict():
     print(y_pred)
     return dict(prediction = str(y_pred))
 
+'''
 @app.get('/predictproba')
 def predict():
     model = pickle.load(open('modelml.pkl','rb'))
@@ -59,11 +60,25 @@ def predict():
     'Texte': ['Les riches ne sont pas assez taxés'],
     'Thème Séance': ['Taxes sur le revenu']
 })
-
     X_processed = complete_preproc(X_test)
     y_pred = model.predict_proba(X_processed)
     print(y_pred)
     return dict(prediction = str(y_pred))
+'''
+@app.get('/predictproba')
+def predict():
+    model = pickle.load(open('modelml.pkl','rb'))
+    assert model is not None
+    X_test = pd.DataFrame({
+    'Texte': ['Les riches ne sont pas assez taxés'],
+    'Thème Séance': ['Taxes sur le revenu']
+})
+    X_processed = complete_preproc(X_test)
+    y_pred = model.predict_proba(X_processed)
+    classes = model.classes_
+    result = {class_label: prob for class_label, prob in zip(classes, y_pred[0])}
+    return result
+
 
 #X_pred = pd.DataFrame(locals(), index = [0])
 
