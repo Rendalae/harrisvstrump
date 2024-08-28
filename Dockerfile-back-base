@@ -1,4 +1,4 @@
-# Base pour les autres Dockerfile ayant besoin de run du ML en python
+# Back base container for not having to pip install every time
 FROM python:3.10.6-buster
 
 RUN apt-get update && apt-get install -y libhdf5-dev

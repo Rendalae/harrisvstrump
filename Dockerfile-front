@@ -1,6 +1,6 @@
 # Streamlit container
-FROM docker.io/library/assnat-front-base-local
-#FROM docker.io/library/assnat-front-base-amd64
+ARG ARCH=local
+FROM docker.io/library/assnat-front-base-${ARCH}
 
 WORKDIR /prod
 

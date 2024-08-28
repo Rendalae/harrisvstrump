@@ -1,5 +1,5 @@
-FROM docker.io/library/assnat-back-base-local
-#FROM docker.io/library/assnat-back-base-amd64
+ARG ARCH=local
+FROM docker.io/library/assnat-back-base-${ARCH}
 
 WORKDIR /prod
 
