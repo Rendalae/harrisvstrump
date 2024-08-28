@@ -51,7 +51,7 @@ def camembert_tokenize_X(X_train, X_test):
     return X_train_tokenized, X_test_tokenized
 
 def camembert(X_train, X_test, y_train, y_test):
-    X_train, X_test, y_train, y_test=sample(1000, X_train, X_test, y_train, y_test)
+    #X_train, X_test, y_train, y_test=sample(1000, X_train, X_test, y_train, y_test)
     # Tokeniser les données d'entrée
     X_train, X_test = camembert_tokenize_X(X_train, X_test)
 
@@ -65,7 +65,7 @@ def camembert(X_train, X_test, y_train, y_test):
 
     # Charger CamemBERT et l'utiliser pour les embeddings
     camembert_model = TFCamembertModel.from_pretrained('camembert-base')
-    camembert_output = camembert_model([input_ids, attention_mask])[0][:, 0, :]
+    camembert_output = camembert_model([input_ids, attention_mask]).last_hidden_state[:, 0, :]
 
     # Ajouter une couche Dense pour la classification finale
     output_layer = tf.keras.layers.Dense(7, activation='softmax')(camembert_output)  # Sigmoid pour une classification binaire
@@ -83,4 +83,4 @@ def camembert(X_train, X_test, y_train, y_test):
 
 
 #fit_predict(mini_embedding_lstm, 'leg15', 5, 10, 64)
-fit_predict(camembert, 'leg15', 5, 10, 64)
+fit_predict(camembert, 'leg15', 5, 1, 64)
