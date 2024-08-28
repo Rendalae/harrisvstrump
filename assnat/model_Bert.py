@@ -26,12 +26,8 @@ from assnat.utils import timestamp
 import time, os
 from collections.abc import Callable
 
-data1 = pd.read_csv('data/leg15.csv')
-data2 = pd.read_csv('data/leg16.csv')
-df = pd.concat([data1, data2], ignore_index=True, axis=0)
-df = pd.read_csv(f'data/leg{legislation_number}.csv')
 
-def train_Bert(leg_, min_words_, na_col_, punct_opt_, sample_size_, batch_size_, patience_, epoch_, max_len_):
+def train_Bert(leg_, min_words_, na_col_, simplify_fam_, drop_names_, drop_fam_, punct_opt_, sample_size_, batch_size_, patience_, epoch_, max_len_):
 
     # Load and preprocess data
     if leg_ == 'all':
@@ -40,8 +36,10 @@ def train_Bert(leg_, min_words_, na_col_, punct_opt_, sample_size_, batch_size_,
         df = pd.concat([data1, data2], ignore_index=True, axis=0)
     else:
         df = pd.read_csv(leg_)
-    df_preproc = complete_preproc(df, na_col=["Texte", "famille"], simplify_fam= True, drop_fam=['Variable'], drop_names=["Mme la présidente", "M. le président"], min_words=min_words_, punct_opt=True)
+    df_preproc = complete_preproc(df, na_col=na_col_, simplify_fam= simplify_fam_, drop_fam=drop_fam_, drop_names=drop_names_, min_words=min_words_, punct_opt=punct_opt_)
     print("Data loaded and preprocessed!")
+
+    df_preproc = df_preproc.sample(n=sample_size_, random_state=42).reset_index(drop=True)
 
     X = df_preproc['Texte']  # Les textes à classifier
     y = df_preproc['famille']
@@ -52,28 +50,29 @@ def train_Bert(leg_, min_words_, na_col_, punct_opt_, sample_size_, batch_size_,
     print("Camembert tokenizer and model loaded!")
 
     # Embedd by processing the data in smaller batches
-    tokenized_tensors = tokenizer(X[0:sample_size_].tolist(), max_length=max_len_, padding = "max_length", truncation = True, return_tensors="tf")
+    tokenized_tensors = tokenizer(X.tolist(), max_length=max_len_, padding = "max_length", truncation = True, return_tensors="tf")
     embeddings = []
     nb_batches = int(round(sample_size_ / batch_size_,0))
     for i in range(0, sample_size_, batch_size_):
         batch_tensors = {k: v[i:i+batch_size_] for k, v in tokenized_tensors.items()}
         batch_embeddings = model.predict(batch_tensors)
         embeddings.append(batch_embeddings)
-    embeddings_all = np.concatenate([embeddings[x].last_hidden_state[:,0,:] for x in range(nb_batches)], axis=0)
+    X_embed = np.concatenate([embeddings[x].last_hidden_state[:,0,:] for x in range(nb_batches)], axis=0)
 
-    # Create labels and features
+    # Create labels
     label_encoder = LabelEncoder()
-    y_encoded = label_encoder.fit_transform(y)
+    y_target = label_encoder.fit_transform(y)
     label_dim = len(label_encoder.classes_)
-    X_sample = embeddings_all
-    y_sample = y_encoded[0:sample_size_]
-    X_train, X_test, y_train, y_test = train_test_split(X_sample, y_sample, test_size=0.2, random_state=42)
+
+    # Create train and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X_embed, y_target, test_size=0.2, random_state=42)
     print(f"Labels and features ready, with {label_dim} classes!")
 
     # Create model
     input_shape = (768,)
     dense_model = Sequential([
-    Dense(256, activation='relu', input_shape=input_shape),
+    Dense(256, activation='tanh', input_shape=input_shape),
+    Dense(128, activation='relu'),
     Flatten(),
     Dense(label_dim, activation='softmax')
     ])
@@ -111,16 +110,29 @@ def train_Bert(leg_, min_words_, na_col_, punct_opt_, sample_size_, batch_size_,
     pass
 
 # Parameters
-leg_ = 'data/leg16.csv'
-min_words_=10
-na_col_=["Texte", "famille"]
-drop_names_=["Mme la présidente", "M. le président"]
-punct_opt_=True
-sample_size_ = 2_000
-max_len_ = 50
-batch_size_=1000
-patience_=5
-epoch_=5
+leg_1 = 'data/leg16.csv'
+min_words_1=10
+na_col_1=["Texte", "famille"]
+drop_names_1=["Mme la présidente", "M. le président"]
+drop_fam_1 = ["Variable"]
+simplify_fam_1=True
+punct_opt_1=True
+sample_size_1 = 5_000
+max_len_1 = 50
+batch_size_1=1000
+patience_1=5
+epoch_1=10
 
 # Execute function
-train_Bert(leg_, min_words_, na_col_, punct_opt_, sample_size_, batch_size_, patience_, epoch_, max_len_)
+train_Bert(leg_=leg_1
+           , min_words_=min_words_1
+           , na_col_=na_col_1
+           , drop_names_=drop_names_1
+           , drop_fam_=drop_fam_1
+           , simplify_fam_=simplify_fam_1
+           , punct_opt_=punct_opt_1
+           , sample_size_=sample_size_1
+           , batch_size_=batch_size_1
+           , patience_=patience_1
+           , epoch_=epoch_1
+           , max_len_=max_len_1)
