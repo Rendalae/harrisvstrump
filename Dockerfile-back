@@ -1,0 +1,14 @@
+FROM docker.io/library/assnat-back-base-local
+#FROM docker.io/library/assnat-back-base-amd64
+
+WORKDIR /prod
+
+COPY requirements.txt requirements.txt
+COPY assnat assnat
+COPY modelml.pkl modelml.pkl
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENV PYTHONPATH="${PYTHONPATH}:/prod"
+
+CMD uvicorn assnat.API:app --host 0.0.0.0 --port 8080

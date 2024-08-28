@@ -84,3 +84,47 @@ reset_data_dir:
 
 preprocess_data:
 	python -c 'from main import complete_preproc; complete_preproc()'
+
+# DOCKER -- BUILD BACK
+docker_build_back_base_local:
+	docker build -f Dockerfile-back-base -t assnat-back-base-local .
+
+docker_build_back_base_amd64:
+	docker build -f Dockerfile-back-base --platform linux/amd64 -t assnat-back-base-amd64 .
+
+docker_build_back_local:
+	docker build -f Dockerfile-back -t assnat-back-local .
+
+docker_build_back_amd64:
+	echo Build of image assnat-back-amd64 not automated for now because a lot of env vars to setup. See docker-deploy.sh
+
+# DOCKER -- BUILD FRONT
+docker_build_front_base_local:
+	docker build -f Dockerfile-front-base -t assnat-front-base-local .
+
+docker_build_front_base_amd64:
+	docker build --platform linux/amd64 -f Dockerfile-front-base -t assnat-front-base-amd64 .
+
+docker_build_front_local:
+	docker build -f Dockerfile-front -t assnat-front-local .
+
+docker_build_front_amd64:
+	docker build --platform linux/amd64 -f Dockerfile-front -t assnat-front-amd64 .
+
+# DOCKER -- RUN
+docker_run_back_local:
+	docker run -it -p 8000:8080 docker.io/library/assnat-back-local
+
+docker_run_front_local:
+	@source .env && docker run -it -e TOKEN_GIF=$$TOKEN_GIF -e API_URL=http://host.docker.internal:8000/predictproba -p 9000:8080 docker.io/library/assnat-front-local
+
+
+docker_build_all_local:
+	docker_build_back_base_local
+	docker_build_back_local
+	docker_build_front_base_local
+	docker_build_front_local
+
+docker_build_all_base_amd64:
+	docker_build_back_base_amd64
+	docker_build_front_base_amd64

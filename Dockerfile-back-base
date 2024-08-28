@@ -1,0 +1,9 @@
+# Base pour les autres Dockerfile ayant besoin de run du ML en python
+FROM python:3.10.6-buster
+
+RUN apt-get update && apt-get install -y libhdf5-dev
+
+WORKDIR /prod
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+ENV PYTHONPATH="${PYTHONPATH}:/prod"

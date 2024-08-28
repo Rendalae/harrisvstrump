@@ -1,0 +1,9 @@
+# Streamlit container
+FROM docker.io/library/assnat-front-base-local
+#FROM docker.io/library/assnat-front-base-amd64
+
+WORKDIR /prod
+
+COPY assnat_front assnat_front
+
+CMD streamlit run assnat_front/Streamlit.py --server.port=8080 --server.address=0.0.0.0

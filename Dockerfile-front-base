@@ -1,0 +1,3 @@
+# Front base container for not having to pip install every time
+FROM python:3.10.6-slim
+RUN pip install --no-cache-dir streamlit matplotlib numpy pandas

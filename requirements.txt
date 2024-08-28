@@ -1,0 +1,14 @@
+transformers
+tensorflow
+tf-keras
+pandas
+matplotlib
+seaborn
+tensorflow_datasets
+scikit-learn
+sentencepiece
+datasets
+accelerate
+numpy
+uvicorn
+fastapi
