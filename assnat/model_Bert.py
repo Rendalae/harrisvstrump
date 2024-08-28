@@ -26,11 +26,20 @@ from assnat.utils import timestamp
 import time, os
 from collections.abc import Callable
 
+data1 = pd.read_csv('data/leg15.csv')
+data2 = pd.read_csv('data/leg16.csv')
+df = pd.concat([data1, data2], ignore_index=True, axis=0)
+df = pd.read_csv(f'data/leg{legislation_number}.csv')
 
 def train_Bert(leg_, min_words_, na_col_, punct_opt_, sample_size_, batch_size_, patience_, epoch_, max_len_):
 
     # Load and preprocess data
-    df = pd.read_csv(leg_)
+    if leg_ == 'all':
+        data1 = pd.read_csv('data/leg15.csv')
+        data2 = pd.read_csv('data/leg16.csv')
+        df = pd.concat([data1, data2], ignore_index=True, axis=0)
+    else:
+        df = pd.read_csv(leg_)
     df_preproc = complete_preproc(df, na_col=["Texte", "famille"], simplify_fam= True, drop_fam=['Variable'], drop_names=["Mme la présidente", "M. le président"], min_words=min_words_, punct_opt=True)
     print("Data loaded and preprocessed!")
 
