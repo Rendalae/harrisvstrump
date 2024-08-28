@@ -38,15 +38,25 @@ def root():
     return {'greetings':'hello'}
 
 @app.get('/predict')
-def predict():
+def predict(
+    Texte: str,
+    Theme: str
+):
     model = pickle.load(open('modelml.pkl','rb'))
     assert model is not None
-    X_test = pd.DataFrame({
-    'Texte': ['Les riches ne sont pas assez taxés'],
-    'Thème Séance': ['Taxes sur le revenu']
-})
+
+    X_test = pd.DataFrame(locals(), index=[0])
+    print(X_test)
+    print(X_test.columns)
+    X_test.drop(columns=['model'],inplace=True)
+    print(X_test)
+    print(X_test.columns)
+
+    X_test.columns = ['Texte', 'Thème Séance']
+
     print('X existing')
     X_processed = complete_preproc(X_test,simplify_fam=False)
+
     y_pred = model.predict(X_processed)
     print(y_pred)
     return dict(prediction = str(y_pred))
@@ -66,13 +76,23 @@ def predict():
     return dict(prediction = str(y_pred))
 '''
 @app.get('/predictproba')
-def predict_proba():
+def predict(
+    Texte: str,
+    Theme: str
+):
     model = pickle.load(open('modelml.pkl','rb'))
     assert model is not None
-    X_test = pd.DataFrame({
-    'Texte': ['Les riches ne sont pas assez taxés'],
-    'Thème Séance': ['Taxes sur le revenu']
-})
+
+    X_test = pd.DataFrame(locals(), index=[0])
+    print(X_test)
+    print(X_test.columns)
+    X_test.drop(columns=['model'],inplace=True)
+    print(X_test)
+    print(X_test.columns)
+
+    X_test.columns = ['Texte', 'Thème Séance']
+
+    print('X existing')
     X_processed = complete_preproc(X_test, simplify_fam = False)
     y_pred = model.predict_proba(X_processed)
     classes = model.classes_
