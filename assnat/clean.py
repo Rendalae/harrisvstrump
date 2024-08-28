@@ -26,6 +26,8 @@ def complete_preproc(df, drop_col = DROP_COLS, simplify_fam = SIMPLIFY_FAM, drop
         'Extrême gauche': 'Gauche',
         'Variable': 'Variable'
         }
+
+        print(df)
         df['famille'] = df['famille'].apply(lambda x: famille_broad.get(x, x))
         print('families simplified')
 
@@ -50,6 +52,10 @@ def complete_preproc(df, drop_col = DROP_COLS, simplify_fam = SIMPLIFY_FAM, drop
     print('Preprocessing done!')
 
     return df
+
+
+
+
 
 def drop_certain_families(df,family): # Removes families you choose
     if len(family)>0:
