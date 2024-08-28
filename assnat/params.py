@@ -1,6 +1,7 @@
 import os
 
 DROP_COLS= []
+SIMPLIFY_FAM = True
 DROP_FAM = []
 NA_COLS= []
 DROP_NAMES = []

@@ -9,11 +9,25 @@ from tensorflow.keras.preprocessing.text import text_to_word_sequence
 from assnat.params import *
 
 
-def complete_preproc(df, drop_col = DROP_COLS, drop_fam = DROP_FAM, na_col = NA_COLS , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
+def complete_preproc(df, drop_col = DROP_COLS, simplify_fam = SIMPLIFY_FAM, drop_fam = DROP_FAM, na_col = NA_COLS , drop_names = DROP_NAMES , min_words= MIN_WORDS, punct_opt=PUNCT_OPT):
     if len(drop_col)>0:
         df = df.drop(columns= drop_col) #drop columns with parameters you do not want
     print('Columns dropped')
     #print(df.head())
+
+    if simplify_fam:
+        famille_broad = {
+        'Centre': 'Centre',
+        'Centre-droit': 'Centre',
+        'Centre-gauche': 'Centre',
+        'Droite': 'Droite',
+        'Extrême droite': 'Droite',
+        'Gauche': 'Gauche',
+        'Extrême gauche': 'Gauche',
+        'Variable': 'Variable'
+        }
+        df['famille'] = df['famille'].apply(lambda x: famille_broad.get(x, x))
+        print('families simplified')
 
     df = drop_certain_families(df, drop_fam)
     print('family dropped')
