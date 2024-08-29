@@ -80,14 +80,14 @@ def train_Bert(leg_, min_words_, na_col_, simplify_fam_, drop_names_, drop_fam_,
     # Train and fit model
     early_stopper = EarlyStopping(monitor='val_loss', patience=patience_, restore_best_weights=True)
     dense_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-    checkpoints_dir=f'data/checkpoints/{timestamp()}'
-    os.makedirs(checkpoints_dir, exist_ok=True)
-    checkpoints_path = checkpoints_dir+"/cp-{epoch:04d}.ckpt"
-    checkpoints = ModelCheckpoint(
-        filepath=checkpoints_path,
-        save_weights_only=True,
-        save_freq='epoch')
-    dense_model.fit(X_train, y_train, validation_split=0.2, epochs=epoch_, batch_size=32, callbacks=[early_stopper,checkpoints])
+    # checkpoints_dir=f'data/checkpoints/{timestamp()}'
+    # os.makedirs(checkpoints_dir, exist_ok=True)
+    # checkpoints_path = checkpoints_dir+"/cp-{epoch:04d}.ckpt"
+    # checkpoints = ModelCheckpoint(
+    #     filepath=checkpoints_path,
+    #     save_weights_only=True,
+    #     save_freq='epoch')
+    dense_model.fit(X_train, y_train, validation_split=0.2, epochs=epoch_, batch_size=32, callbacks=[early_stopper])
     print("Model trained!")
 
     # Save model
