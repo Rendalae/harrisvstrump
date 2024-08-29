@@ -27,7 +27,7 @@ import time, os
 from collections.abc import Callable
 
 
-def train_Bert(leg_, min_words_, na_col_, simplify_fam_, drop_names_, drop_fam_, punct_opt_, sample_size_, batch_size_, patience_, epoch_, max_len_):
+def train_Bert(leg_, min_words_, na_col_, simplify_fam_, drop_names_, drop_fam_, punct_opt_, sample_size_, batch_size_, patience_, epoch_, max_len_, save_id_):
 
     # Load and preprocess data
     if leg_ == 'all':
@@ -90,12 +90,14 @@ def train_Bert(leg_, min_words_, na_col_, simplify_fam_, drop_names_, drop_fam_,
     dense_model.fit(X_train, y_train, validation_split=0.2, epochs=epoch_, batch_size=32, callbacks=[early_stopper])
     print("Model trained!")
 
-    # Save model
-    models_dir=f'data/models/{timestamp()}'
+    # Save the entire model to a HDF5 file.
+    models_dir=f'models/{timestamp()}'
     os.makedirs(models_dir, exist_ok=True)
-    model_path = models_dir+"/bert-{epoch:04d}.keras"
-    save_model(dense_model, model_path, overwrite=True)
+    model_name = f"model_bert_{save_id_}"
+    # The '.h5' extension indicates that the model should be saved to HDF5.
+    dense_model.save(model_name)
     print("Model saved!")
+    #save_model(dense_model, model_path, overwrite=True)
 
     #dense_model.evaluate(X_test, y_test)
 
@@ -110,18 +112,19 @@ def train_Bert(leg_, min_words_, na_col_, simplify_fam_, drop_names_, drop_fam_,
     pass
 
 # Parameters
-leg_1 = 'data/leg16.csv'
+leg_1 = 'all'
 min_words_1=10
 na_col_1=["Texte", "famille"]
 drop_names_1=["Mme la présidente", "M. le président"]
 drop_fam_1 = ["Variable"]
 simplify_fam_1=True
 punct_opt_1=True
-sample_size_1 = 5_000
+sample_size_1 = 2_000
 max_len_1 = 50
 batch_size_1=1000
 patience_1=5
 epoch_1=10
+save_id_1 = "all_4"
 
 # Execute function
 train_Bert(leg_=leg_1
@@ -135,4 +138,5 @@ train_Bert(leg_=leg_1
            , batch_size_=batch_size_1
            , patience_=patience_1
            , epoch_=epoch_1
-           , max_len_=max_len_1)
+           , max_len_=max_len_1
+           ,save_id_=save_id_1)
