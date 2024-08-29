@@ -93,7 +93,7 @@ def train_Bert(leg_, min_words_, na_col_, simplify_fam_, drop_names_, drop_fam_,
     # Save the entire model to a HDF5 file.
     models_dir=f'models/{timestamp()}'
     os.makedirs(models_dir, exist_ok=True)
-    model_name = f"model_bert_{save_id_}"
+    model_name = f"model_bert_{save_id_}.h5"
     # The '.h5' extension indicates that the model should be saved to HDF5.
     dense_model.save(model_name)
     print("Model saved!")
